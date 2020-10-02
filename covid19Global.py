@@ -22,7 +22,7 @@ def save_elasticsearch_es(index, result_data):
 def main():
     try:
         start_date = date(2020, 3, 1)
-        end_date = date(2020, 4, 9)
+        end_date = date(2020, 10, 2)
         delta = timedelta(days=1)
         while start_date <= end_date:  
             day = start_date.strftime("%Y-%m-%d")  
@@ -45,25 +45,23 @@ def main():
                         infection_rate=0
                         print(e)
 
-            if population != None:
-                try:
-                    infection_rate=getInfectionRate(data['dates'][day]['countries'][country]['today_confirmed'], population)
-                    print(infection_rate)
-                except:
-                    infection_rate=0
+                    if population != None:
+                        try:
+                            infection_rate=getInfectionRate(data['dates'][day]['countries'][country]['today_confirmed'], population)
+                        except:
+                            infection_rate=0
 
-            result_data = data['dates'][day]['countries'][country]
-            del result_data['regions']
-            result_data['timestamp'] = result_data.pop('date')
-            result_data.update(
-                        timestamp=datetime.strptime(day, "%Y-%m-%d"),
-                        country_iso_3=country_iso_3,
-                        population=population,
-                        infection_rate=infection_rate,
-                        )
+                    result_data = data['dates'][day]['countries'][country]
+                    del result_data['regions']
+                    result_data['timestamp'] = result_data.pop('date')
+                    result_data.update(
+                                timestamp=datetime.strptime(day, "%Y-%m-%d"),
+                                country_iso_3=country_iso_3,
+                                population=population,
+                                infection_rate=infection_rate,
+                                )
 
-            print(result_data)
-            save_elasticsearch_es('covid-19-live-global',result_data)
+                    save_elasticsearch_es('covid-19-live-global',result_data)
     except Exception as e:
         print(e)
 
